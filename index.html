@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英语国际音标学习</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px 20px 80px;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      padding: 10px 20px 20px;
+      color: white;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 1.05em;
+      opacity: 0.9;
+      margin-bottom: 16px;
+    }
+
+    /* Toggle switch */
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .switch-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background: rgba(255,255,255,0.15);
+      padding: 8px 18px;
+      border-radius: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 26px;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .switch input:checked + .slider {
+      background: #48DBFB;
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(22px);
+    }
+
+    /* Main container */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Category sections */
+    .category {
+      margin-bottom: 28px;
+    }
+
+    .category-header {
+      color: white;
+      font-size: 1.25em;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .short-vowels .category-header { background: rgba(255,107,107,0.6); }
+    .long-vowels .category-header { background: rgba(255,159,67,0.6); }
+    .diphthongs .category-header { background: rgba(254,202,87,0.5); }
+    .plosives .category-header { background: rgba(72,219,251,0.5); }
+    .fricatives .category-header { background: rgba(10,189,227,0.5); }
+    .affricates .category-header { background: rgba(16,172,132,0.5); }
+    .nasals .category-header { background: rgba(162,155,254,0.5); }
+    .approximants .category-header { background: rgba(108,92,231,0.5); }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 12px;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 12px 8px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      user-select: none;
+      position: relative;
+      outline: none;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    .card.active {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 4px #FFD700, 0 8px 24px rgba(0,0,0,0.25);
+      z-index: 10;
+    }
+
+    .card.speaking {
+      animation: pulse 0.6s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px #FFD700, 0 8px 24px rgba(0,0,0,0.25); }
+      50% { box-shadow: 0 0 0 8px rgba(255,215,0,0.5), 0 8px 30px rgba(0,0,0,0.3); }
+    }
+
+    .card .emoji {
+      font-size: 1.7em;
+      display: block;
+      line-height: 1.3;
+    }
+
+    .card .ipa {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #2c3e50;
+      display: block;
+      margin: 4px 0 2px;
+      font-family: 'Lucida Sans Unicode', 'DejaVu Sans', sans-serif;
+    }
+
+    .card .word {
+      font-size: 0.9em;
+      color: #666;
+      display: block;
+    }
+
+    .card .word b {
+      color: #e74c3c;
+      font-weight: 700;
+    }
+
+    /* Category border colors */
+    .short-vowels .card { border-top: 4px solid #FF6B6B; }
+    .long-vowels .card { border-top: 4px solid #FF9F43; }
+    .diphthongs .card { border-top: 4px solid #FECA57; }
+    .plosives .card { border-top: 4px solid #48DBFB; }
+    .fricatives .card { border-top: 4px solid #0ABDE3; }
+    .affricates .card { border-top: 4px solid #10AC84; }
+    .nasals .card { border-top: 4px solid #A29BFE; }
+    .approximants .card { border-top: 4px solid #6C5CE7; }
+
+    /* Speaker icon */
+    .speaker-icon {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.8em;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .card.active .speaker-icon {
+      opacity: 0.5;
+    }
+
+    /* Footer hints */
+    .hints {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: white;
+      font-size: 0.9em;
+      padding: 12px 20px;
+      background: rgba(50,30,80,0.85);
+      backdrop-filter: blur(6px);
+    }
+
+    .hints kbd {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: inherit;
+      font-size: 0.95em;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.5em; }
+      .card-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+      .card { padding: 10px 6px 12px; }
+      .card .emoji { font-size: 1.3em; }
+      .card .ipa { font-size: 1.2em; }
+      .card .word { font-size: 0.8em; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>英语国际音标学习</h1>
+  <p class="subtitle">用方向键选择音标卡片，按 Enter 播放发音</p>
+  <div class="controls">
+    <label class="switch-label">
+      <span>跳转自动播放</span>
+      <div class="switch">
+        <input type="checkbox" id="autoplay" checked>
+        <span class="slider"></span>
+      </div>
+    </label>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer class="hints">
+  <kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>&uarr;</kbd> <kbd>&darr;</kbd> 选择音标 &nbsp;&middot;&nbsp;
+  <kbd>Enter</kbd> 播放发音 &nbsp;&middot;&nbsp;
+  <kbd>Space</kbd> 播放发音
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Phoneme data ──────────────────────────────────────────
+  var categories = [
+    {
+      name: '短元音 Short Vowels',
+      className: 'short-vowels',
+      items: [
+        { ipa: '/ɪ/',  word: 'f<b>i</b>sh',    speak: 'fish',     emoji: '🐟' },
+        { ipa: '/e/',  word: 'b<b>e</b>d',      speak: 'bed',      emoji: '🛏️' },
+        { ipa: '/æ/',  word: 'c<b>a</b>t',      speak: 'cat',      emoji: '🐱' },
+        { ipa: '/ɒ/',  word: 'h<b>o</b>t',      speak: 'hot',      emoji: '🔥' },
+        { ipa: '/ʌ/',  word: 'c<b>u</b>p',      speak: 'cup',      emoji: '☕' },
+        { ipa: '/ʊ/',  word: 'b<b>oo</b>k',     speak: 'book',     emoji: '📖' },
+        { ipa: '/ə/',  word: '<b>a</b>bout',     speak: 'about',    emoji: '💭' }
+      ]
+    },
+    {
+      name: '长元音 Long Vowels',
+      className: 'long-vowels',
+      items: [
+        { ipa: '/iː/', word: 's<b>ee</b>',      speak: 'see',      emoji: '👀' },
+        { ipa: '/ɑː/', word: 'c<b>ar</b>',      speak: 'car',      emoji: '🚗' },
+        { ipa: '/ɔː/', word: 'd<b>oor</b>',     speak: 'door',     emoji: '🚪' },
+        { ipa: '/uː/', word: 'bl<b>ue</b>',     speak: 'blue',     emoji: '🔵' },
+        { ipa: '/ɜː/', word: 'b<b>ir</b>d',     speak: 'bird',     emoji: '🐦' }
+      ]
+    },
+    {
+      name: '双元音 Diphthongs',
+      className: 'diphthongs',
+      items: [
+        { ipa: '/eɪ/', word: 'c<b>a</b>ke',     speak: 'cake',     emoji: '🎂' },
+        { ipa: '/aɪ/', word: 'k<b>i</b>te',     speak: 'kite',     emoji: '🪁' },
+        { ipa: '/ɔɪ/', word: 'b<b>oy</b>',      speak: 'boy',      emoji: '👦' },
+        { ipa: '/aʊ/', word: 'c<b>ow</b>',      speak: 'cow',      emoji: '🐄' },
+        { ipa: '/əʊ/', word: 'g<b>o</b>',       speak: 'go',       emoji: '🏃' },
+        { ipa: '/ɪə/', word: '<b>ear</b>',       speak: 'ear',      emoji: '👂' },
+        { ipa: '/eə/', word: 'b<b>ear</b>',     speak: 'bear',     emoji: '🐻' },
+        { ipa: '/ʊə/', word: 't<b>our</b>',     speak: 'tour',     emoji: '🗺️' }
+      ]
+    },
+    {
+      name: '爆破音 Plosives',
+      className: 'plosives',
+      items: [
+        { ipa: '/p/', word: '<b>p</b>en',        speak: 'pen',      emoji: '✏️' },
+        { ipa: '/b/', word: '<b>b</b>all',       speak: 'ball',     emoji: '⚽' },
+        { ipa: '/t/', word: '<b>t</b>ea',        speak: 'tea',      emoji: '🍵' },
+        { ipa: '/d/', word: '<b>d</b>uck',       speak: 'duck',     emoji: '🦆' },
+        { ipa: '/k/', word: '<b>k</b>ing',       speak: 'king',     emoji: '👑' },
+        { ipa: '/g/', word: '<b>g</b>irl',       speak: 'girl',     emoji: '👧' }
+      ]
+    },
+    {
+      name: '摩擦音 Fricatives',
+      className: 'fricatives',
+      items: [
+        { ipa: '/f/', word: '<b>f</b>ox',        speak: 'fox',      emoji: '🦊' },
+        { ipa: '/v/', word: '<b>v</b>an',        speak: 'van',      emoji: '🚐' },
+        { ipa: '/θ/', word: '<b>th</b>umb',      speak: 'thumb',    emoji: '👍' },
+        { ipa: '/ð/', word: '<b>th</b>is',       speak: 'this',     emoji: '👆' },
+        { ipa: '/s/', word: '<b>s</b>un',        speak: 'sun',      emoji: '☀️' },
+        { ipa: '/z/', word: '<b>z</b>oo',        speak: 'zoo',      emoji: '🦓' },
+        { ipa: '/ʃ/', word: '<b>sh</b>ip',       speak: 'ship',     emoji: '🚢' },
+        { ipa: '/ʒ/', word: 'trea<b>s</b>ure',   speak: 'treasure', emoji: '💎' },
+        { ipa: '/h/', word: '<b>h</b>at',        speak: 'hat',      emoji: '🎩' }
+      ]
+    },
+    {
+      name: '破擦音 Affricates',
+      className: 'affricates',
+      items: [
+        { ipa: '/tʃ/', word: '<b>ch</b>eese',   speak: 'cheese',   emoji: '🧀' },
+        { ipa: '/dʒ/', word: '<b>j</b>uice',    speak: 'juice',    emoji: '🧃' }
+      ]
+    },
+    {
+      name: '鼻音 Nasals',
+      className: 'nasals',
+      items: [
+        { ipa: '/m/', word: '<b>m</b>oon',       speak: 'moon',     emoji: '🌙' },
+        { ipa: '/n/', word: '<b>n</b>ose',       speak: 'nose',     emoji: '👃' },
+        { ipa: '/ŋ/', word: 'ri<b>ng</b>',       speak: 'ring',     emoji: '💍' }
+      ]
+    },
+    {
+      name: '近音 Approximants',
+      className: 'approximants',
+      items: [
+        { ipa: '/l/', word: '<b>l</b>eaf',       speak: 'leaf',     emoji: '🍃' },
+        { ipa: '/r/', word: '<b>r</b>ain',       speak: 'rain',     emoji: '🌧️' },
+        { ipa: '/w/', word: '<b>w</b>ater',      speak: 'water',    emoji: '💧' },
+        { ipa: '/j/', word: '<b>y</b>ellow',     speak: 'yellow',   emoji: '💛' }
+      ]
+    }
+  ];
+
+  // ── Build DOM ─────────────────────────────────────────────
+  var app = document.getElementById('app');
+  var allCards = [];
+
+  categories.forEach(function (cat) {
+    var section = document.createElement('section');
+    section.className = 'category ' + cat.className;
+
+    var header = document.createElement('div');
+    header.className = 'category-header';
+    header.textContent = cat.name;
+    section.appendChild(header);
+
+    var grid = document.createElement('div');
+    grid.className = 'card-grid';
+
+    cat.items.forEach(function (item) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('tabindex', '-1');
+      card.innerHTML =
+        '<span class="speaker-icon">🔊</span>' +
+        '<span class="emoji">' + item.emoji + '</span>' +
+        '<span class="ipa">' + item.ipa + '</span>' +
+        '<span class="word">' + item.word + '</span>';
+      card.dataset.speak = item.speak;
+
+      card.addEventListener('click', function () {
+        activateCard(allCards.indexOf(card), true);
+      });
+
+      grid.appendChild(card);
+      allCards.push(card);
+    });
+
+    section.appendChild(grid);
+    app.appendChild(section);
+  });
+
+  // ── State ─────────────────────────────────────────────────
+  var currentIndex = 0;
+  var autoplayCheckbox = document.getElementById('autoplay');
+
+  function isAutoplay() {
+    return autoplayCheckbox.checked;
+  }
+
+  // ── Speech ────────────────────────────────────────────────
+  var synth = window.speechSynthesis;
+
+  function speak(word) {
+    if (!synth) return;
+    synth.cancel();
+
+    var utter = new SpeechSynthesisUtterance(word);
+    utter.lang = 'en-US';
+    utter.rate = 0.75;
+    utter.pitch = 1.0;
+
+    // Try to pick an English voice
+    var voices = synth.getVoices();
+    var enVoice = voices.find(function (v) {
+      return v.lang.startsWith('en');
+    });
+    if (enVoice) utter.voice = enVoice;
+
+    // Pulse animation
+    var card = allCards[currentIndex];
+    card.classList.remove('speaking');
+    void card.offsetWidth; // trigger reflow
+    card.classList.add('speaking');
+    utter.onend = function () {
+      card.classList.remove('speaking');
+    };
+
+    synth.speak(utter);
+  }
+
+  // Preload voices (some browsers load them async)
+  if (synth && synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = function () { synth.getVoices(); };
+  }
+
+  // ── Card activation ───────────────────────────────────────
+  function activateCard(index, forceSpeak) {
+    if (index < 0 || index >= allCards.length) return;
+
+    allCards[currentIndex].classList.remove('active');
+    currentIndex = index;
+    allCards[currentIndex].classList.add('active');
+    allCards[currentIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+    if (forceSpeak || isAutoplay()) {
+      speak(allCards[currentIndex].dataset.speak);
+    }
+  }
+
+  // Initialize first card
+  allCards[0].classList.add('active');
+
+  // ── Keyboard navigation ───────────────────────────────────
+  function findCardInDirection(direction) {
+    var current = allCards[currentIndex].getBoundingClientRect();
+    var cx = current.left + current.width / 2;
+    var cy = current.top + current.height / 2;
+
+    var bestIndex = -1;
+    var bestScore = Infinity;
+
+    for (var i = 0; i < allCards.length; i++) {
+      if (i === currentIndex) continue;
+
+      var rect = allCards[i].getBoundingClientRect();
+      var x = rect.left + rect.width / 2;
+      var y = rect.top + rect.height / 2;
+
+      var validDir = false;
+      var score = Infinity;
+
+      switch (direction) {
+        case 'left':
+          // Same row, to the left
+          if (Math.abs(y - cy) < rect.height * 0.5 && x < cx - 5) {
+            validDir = true;
+            score = cx - x; // closer is better
+          }
+          break;
+        case 'right':
+          if (Math.abs(y - cy) < rect.height * 0.5 && x > cx + 5) {
+            validDir = true;
+            score = x - cx;
+          }
+          break;
+        case 'up':
+          if (y < cy - 5) {
+            validDir = true;
+            // Prioritize closest row, then closest column
+            score = (cy - y) * 3 + Math.abs(x - cx);
+          }
+          break;
+        case 'down':
+          if (y > cy + 5) {
+            validDir = true;
+            score = (y - cy) * 3 + Math.abs(x - cx);
+          }
+          break;
+      }
+
+      if (validDir && score < bestScore) {
+        bestScore = score;
+        bestIndex = i;
+      }
+    }
+
+    return bestIndex;
+  }
+
+  // Fallback: wrap around for left/right
+  function navigateLeftRight(direction) {
+    var found = findCardInDirection(direction);
+    if (found !== -1) return found;
+
+    // Wrap around
+    if (direction === 'left') {
+      return (currentIndex - 1 + allCards.length) % allCards.length;
+    }
+    return (currentIndex + 1) % allCards.length;
+  }
+
+  document.addEventListener('keydown', function (e) {
+    var target = -1;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        target = navigateLeftRight('left');
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        target = navigateLeftRight('right');
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        target = findCardInDirection('up');
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        target = findCardInDirection('down');
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        speak(allCards[currentIndex].dataset.speak);
+        return;
+      default:
+        return;
+    }
+
+    if (target !== -1) {
+      activateCard(target, false);
+    }
+  });
+
+  // Prevent space from scrolling page
+  window.addEventListener('keydown', function (e) {
+    if (e.key === ' ' && e.target === document.body) {
+      e.preventDefault();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
